@@ -2,11 +2,15 @@
 
 import { useState, useCallback } from "react"
 import type { Message } from "@/types/chat"
+import { useApiUsage } from "@/hooks/use-api-usage"
+import { useToast } from "@/components/ui/use-toast"
 
 export function useGroqChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTask, setSelectedTask] = useState<string | null>(null)
+  const { apiUsage, recordApiCall, isRequestLimitReached, isTokenLimitReached } = useApiUsage()
+  const { toast } = useToast()
 
   // Função para definir a tarefa selecionada
   const setTask = useCallback((task: string | null) => {
@@ -17,6 +21,25 @@ export function useGroqChat() {
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim()) return
+
+      // Verificar se atingiu limites
+      if (isRequestLimitReached) {
+        toast({
+          title: "Limite de requisições atingido",
+          description: "Aguarde um momento antes de fazer uma nova requisição.",
+          variant: "destructive"
+        })
+        return
+      }
+
+      if (isTokenLimitReached) {
+        toast({
+          title: "Limite diário de tokens atingido",
+          description: "Você atingiu seu limite diário de tokens. Tente novamente amanhã.",
+          variant: "destructive"
+        })
+        return
+      }
 
       // Adicionar mensagem do usuário
       const userMessage: Message = { role: "user", content }
@@ -40,6 +63,9 @@ export function useGroqChat() {
         const assistantMessage: Message = { role: "assistant", content: "" }
         setMessages((prev) => [...prev, assistantMessage])
 
+        // Registrar a chamada de API
+        recordApiCall()
+
         // Enviar para a API do Next.js
         const response = await fetch('/api/chat', {
           method: 'POST',
@@ -57,6 +83,12 @@ export function useGroqChat() {
         }
 
         const result = await response.json()
+
+        // Calcular tokens aproximados
+        const estimatedTokens = Math.ceil(result.usage?.total_tokens || result.choices?.[0]?.message?.content.length / 4 || 0)
+        
+        // Registrar uso de tokens
+        recordApiCall(estimatedTokens)
 
         // Atualizar a mensagem do assistente com a resposta
         if (result.choices && result.choices[0]?.message?.content) {
@@ -81,7 +113,7 @@ export function useGroqChat() {
         setIsLoading(false)
       }
     },
-    [messages, selectedTask]
+    [messages, selectedTask, isRequestLimitReached, isTokenLimitReached, recordApiCall, toast]
   )
 
   // Função para processar arquivos carregados

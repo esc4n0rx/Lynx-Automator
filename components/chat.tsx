@@ -8,28 +8,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Copy, Check } from "lucide-react"
 import dynamic from "next/dynamic"
 import { cn } from "@/lib/utils"
+import type { CSSProperties } from "react";
 
-const SyntaxHighlighter = dynamic(() => import("react-syntax-highlighter/dist/cjs/prism").then((mod) => mod.Prism), {
-  ssr: false,
-})
 
-const vscDarkPlus = dynamic(
-  () =>
-    import("react-syntax-highlighter/dist/cjs/styles/prism").then((mod) => {
-      // Customize the VSC dark plus theme
-      const theme = { ...mod.vscDarkPlus }
-      theme['pre[class*="language-"]'] = {
-        ...theme['pre[class*="language-"]'],
-        background: "#0f1117",
-      }
-      theme['code[class*="language-"]'] = {
-        ...theme['code[class*="language-"]'],
-        color: "#e0e0e0",
-      }
-      return theme
-    }),
-  { ssr: false },
-)
+const SyntaxHighlighter = dynamic(
+  () => import("react-syntax-highlighter").then((mod) => mod.Prism),
+  { ssr: false }
+);
+
+import { vscDarkPlus as CodeStyle } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface ChatProps {
   messages: Message[]
@@ -160,25 +147,19 @@ export function Chat({ messages, isLoading }: ChatProps) {
                     {copiedIndex === i ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </button>
                 </div>
-                {SyntaxHighlighter && vscDarkPlus ? (
-                  <SyntaxHighlighter
-                    language={block.language || "vba"}
-                    style={vscDarkPlus}
-                    customStyle={{
-                      margin: 0,
-                      padding: "1rem",
-                      background: "var(--code-bg)",
-                      borderRadius: "0 0 0.375rem 0.375rem",
-                      fontFamily: "var(--font-jetbrains)",
-                    }}
-                  >
-                    {block.code}
-                  </SyntaxHighlighter>
-                ) : (
-                  <pre className="bg-[var(--code-bg)] p-4 rounded-b-md overflow-x-auto font-jetbrains">
-                    <code>{block.code}</code>
-                  </pre>
-                )}
+                <SyntaxHighlighter
+                  language={block.language || "vba"}
+                  style={CodeStyle}
+                  customStyle={{
+                    margin: 0,
+                    padding: "1rem",
+                    background: "var(--code-bg)",
+                    borderRadius: "0 0 0.375rem 0.375rem",
+                    fontFamily: "var(--font-jetbrains)",
+                  }}
+                >
+                  {block.code}
+                </SyntaxHighlighter>
               </div>
             ))}
           </motion.div>
@@ -192,7 +173,7 @@ export function Chat({ messages, isLoading }: ChatProps) {
               <div className="message-content">
                 <ReactMarkdown
                   components={{
-                    code({ node, inline, className, children, ...props }) {
+                    code({ node, inline, className, children, ...props }: { node?: any, inline?: boolean, className?: string, children?: React.ReactNode } & React.ComponentPropsWithoutRef<'code'>) {
                       const match = /language-(\w+)/.exec(className || "")
                       const language = match ? match[1] : "vba"
                       const codeIndex = index * 1000 + (match ? match.index : 0)
@@ -209,26 +190,19 @@ export function Chat({ messages, isLoading }: ChatProps) {
                               {copiedIndex === codeIndex ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                             </button>
                           </div>
-                          {SyntaxHighlighter && vscDarkPlus ? (
-                            <SyntaxHighlighter
-                              language={language}
-                              style={vscDarkPlus}
-                              customStyle={{
-                                margin: 0,
-                                padding: "1rem",
-                                background: "var(--code-bg)",
-                                borderRadius: "0 0 0.375rem 0.375rem",
-                                fontFamily: "var(--font-jetbrains)",
-                              }}
-                              {...props}
-                            >
-                              {String(children).replace(/\n$/, "")}
-                            </SyntaxHighlighter>
-                          ) : (
-                            <pre className="bg-[var(--code-bg)] p-4 rounded-b-md overflow-x-auto font-jetbrains">
-                              <code>{children}</code>
-                            </pre>
-                          )}
+                          <SyntaxHighlighter
+                          language={language}
+                          style={CodeStyle as unknown as { [key: string]: CSSProperties }}
+                          customStyle={{
+                            margin: 0,
+                            padding: "1rem",
+                            background: "var(--code-bg)",
+                            borderRadius: "0 0 0.375rem 0.375rem",
+                            fontFamily: "var(--font-jetbrains)",
+                          }}
+                        >
+                          {String(children)}
+                        </SyntaxHighlighter>
                         </div>
                       ) : (
                         <code

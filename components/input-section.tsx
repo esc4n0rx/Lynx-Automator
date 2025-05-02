@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,9 +17,24 @@ export function InputSection() {
   const [inputValue, setInputValue] = useState("")
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
   const [files, setFiles] = useState<File[]>([])
+  const [isWorkSessionActive, setIsWorkSessionActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const { messages, isLoading, sendMessage } = useGroqChat()
+  const { messages, isLoading, sendMessage, selectedTask, setTask } = useGroqChat()
+
+  // Função para tratar o evento 'keydown' quando o Enter é pressionado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && document.activeElement === inputRef.current) {
+        e.preventDefault()
+        handleSubmit()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [inputValue, files]) // Depende do inputValue e files
 
   const handleInputFocus = () => {
     if (!isExpanded && (!messages || messages.length === 0)) {
@@ -33,9 +48,37 @@ export function InputSection() {
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option)
+    setTask(option)
     if (!isExpanded) {
       setIsExpanded(true)
     }
+  }
+
+  const handleCustomFlowComplete = async (option: string, inputs: string[]) => {
+    // Definir a opção selecionada
+    setSelectedOption(option)
+    setTask(option)
+    
+    // Construir a mensagem com base no fluxo
+    let message = ""
+    
+    if (option === "Manutenção de Macro") {
+      // Fluxo de manutenção de macro
+      const vbaCode = inputs[0]
+      message = `Preciso de ajuda para revisar, otimizar e corrigir o seguinte código VBA:\n\n\`\`\`vba\n${vbaCode}\n\`\`\``
+    } else if (option === "SAP ↔ Excel") {
+      // Fluxo SAP ↔ Excel
+      const context = inputs[0]
+      const vbsScript = inputs[2] // índice 2 porque o índice 1 é o componente informativo
+      message = `Preciso criar uma integração entre SAP e Excel.\n\nContexto: ${context}\n\nScript VBS gravado do SAP:\n\n\`\`\`vbs\n${vbsScript}\n\`\`\`\n\nPor favor, converta este script VBS para VBA otimizado para integração SAP-Excel.`
+    }
+    
+    // Ativar a sessão de trabalho
+    setIsWorkSessionActive(true)
+    setIsExpanded(true)
+    
+    // Enviar a mensagem
+    await sendMessage(message)
   }
 
   const handleFileSelect = () => {
@@ -67,16 +110,15 @@ export function InputSection() {
 
     // Prepare message with file contents
     let messageContent = inputValue
-    if (fileContents.length > 0) {
-      messageContent +=
-        "\n\nAttached files:\n" + fileContents.map((file) => `\n--- ${file.name} ---\n${file.content}`).join("\n")
-    }
 
     // Add context based on selected option
     if (selectedOption) {
       messageContent = `[Task: ${selectedOption}] ${messageContent}`
     }
 
+    // Ativar a sessão de trabalho com animação
+    setIsWorkSessionActive(true)
+    
     // Always expand the UI when sending a message
     setIsExpanded(true)
 
@@ -99,9 +141,18 @@ export function InputSection() {
       animate={{ height: "auto" }}
       transition={{ duration: 0.5, ease: "easeInOut" }}
     >
-      <motion.div className={cn("input-container", isExpanded && "expanded")} layout transition={{ duration: 0.3 }}>
+      <motion.div 
+        className={cn(
+          "input-container w-full", 
+          isExpanded && "expanded",
+          isWorkSessionActive && "work-session-active"
+        )} 
+        layout 
+        transition={{ duration: 0.3 }}
+      >
         <div className="input-with-buttons glow-border">
           <Input
+            ref={inputRef}
             type="text"
             placeholder="Digite sua pergunta ou anexe um arquivo..."
             className="w-full bg-transparent border-none shadow-none focus:ring-0 py-6 px-4 input-animate"
@@ -173,15 +224,29 @@ export function InputSection() {
             transition={{ duration: 0.3 }}
             className="w-full mt-2"
           >
-            <OptionButtons onSelect={handleOptionSelect} />
+            <OptionButtons 
+              onSelect={handleOptionSelect} 
+              onCustomFlowComplete={handleCustomFlowComplete}
+            />
           </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ 
+              opacity: 1, 
+              height: "auto",
+              transition: {
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100,
+                damping: 15
+              }
+            }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full"
+            className={cn(
+              "w-full", 
+              isWorkSessionActive && "work-session"
+            )}
           >
             <Chat messages={messages} isLoading={isLoading} />
           </motion.div>
