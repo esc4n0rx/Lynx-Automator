@@ -1,6 +1,9 @@
 # Lynx Assistente VBA
 
-![Logo do Lynx](public/logo.png)
+<p align="center">
+  <img src="public/logo.png" alt="Logo do Lynx" width="250"/>
+</p>
+
 
 ## Visão Geral
 
