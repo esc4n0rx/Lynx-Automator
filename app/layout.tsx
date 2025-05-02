@@ -25,7 +25,16 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Lynx - VBA Assistant",
   description: "AI-powered VBA code generation and maintenance",
-    generator: 'v0.dev'
+  generator: 'Paulo Oliveira',
+  icons: {
+    icon: '/mascote.ico',
+    shortcut: '/mascote.ico',
+    apple: '/mascote.ico',
+    other: {
+      rel: 'apple-touch-icon-precomposed',
+      url: '/mascote.ico',
+    },
+  }
 }
 
 export default function RootLayout({
@@ -35,6 +44,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
+      <head>
+        <link rel="icon" href="/mascote.ico" />
+      </head>
       <body
         className={`${inter.variable} ${sora.variable} ${jetbrainsMono.variable} font-sans antialiased bg-background text-foreground`}
       >

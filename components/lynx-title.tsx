@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
+import Image from "next/image"
 
 export function LynxTitle() {
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -39,8 +40,22 @@ export function LynxTitle() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="mb-8"
+      className="mb-8 flex items-center justify-center gap-4"
     >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+      >
+        <Image 
+          src="/mascote.png" 
+          alt="Lynx Mascote" 
+          width={80} 
+          height={80} 
+          className="object-contain"
+        />
+      </motion.div>
+      
       <h1
         ref={titleRef}
         className="font-sora text-8xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#0a0a0a] via-[#00FFF0] to-[#0a0a0a] py-2"
