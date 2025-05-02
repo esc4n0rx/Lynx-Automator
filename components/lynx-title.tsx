@@ -50,8 +50,8 @@ export function LynxTitle() {
         <Image 
           src="/mascote.png" 
           alt="Lynx Mascote" 
-          width={80} 
-          height={80} 
+          width={120} 
+          height={120} 
           className="object-contain"
         />
       </motion.div>
