@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react"
 
-// Limites configuráveis
-const DEFAULT_REQUEST_LIMIT = 30; // por minuto
-const DEFAULT_TOKEN_LIMIT = 14400; // por dia
+const DEFAULT_REQUEST_LIMIT = 30; 
+const DEFAULT_TOKEN_LIMIT = 14400; 
 
-// Interface para o uso da API
+
 export interface ApiUsage {
   requestsUsed: number;
   requestsLimit: number;
@@ -22,18 +21,15 @@ export function useApiUsage() {
     tokensLimit: DEFAULT_TOKEN_LIMIT
   });
 
-  // Carregar dados de uso do localStorage ao iniciar
   useEffect(() => {
     try {
       const storedUsage = localStorage.getItem('api-usage');
       if (storedUsage) {
         const parsedUsage = JSON.parse(storedUsage);
-        // Verificar se o último reset foi hoje
         const lastResetDate = localStorage.getItem('api-usage-last-reset');
         const today = new Date().toDateString();
         
         if (lastResetDate !== today) {
-          // Reset diário para tokens
           setApiUsage(prev => ({
             ...prev,
             tokensUsed: 0
@@ -47,23 +43,21 @@ export function useApiUsage() {
       console.error("Erro ao carregar dados de uso da API:", error);
     }
     
-    // Configurar timer para reset da contagem de requisições por minuto
     const minuteInterval = setInterval(() => {
       setApiUsage(prev => ({
         ...prev,
         requestsUsed: 0
       }));
-    }, 60000); // 1 minuto
+    }, 60000); 
     
     return () => clearInterval(minuteInterval);
   }, []);
 
-  // Salvar dados de uso no localStorage quando mudar
   useEffect(() => {
     localStorage.setItem('api-usage', JSON.stringify(apiUsage));
   }, [apiUsage]);
 
-  // Função para registrar uma nova requisição da API
+
   const recordApiCall = (tokenCount: number = 0) => {
     setApiUsage(prev => ({
       ...prev,
@@ -72,7 +66,7 @@ export function useApiUsage() {
     }));
   };
 
-  // Verificar se os limites foram atingidos
+
   const isRequestLimitReached = apiUsage.requestsUsed >= apiUsage.requestsLimit;
   const isTokenLimitReached = apiUsage.tokensUsed >= apiUsage.tokensLimit;
   

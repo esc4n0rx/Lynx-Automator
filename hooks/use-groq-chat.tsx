@@ -12,17 +12,14 @@ export function useGroqChat() {
   const { apiUsage, recordApiCall, isRequestLimitReached, isTokenLimitReached } = useApiUsage()
   const { toast } = useToast()
 
-  // Função para definir a tarefa selecionada
   const setTask = useCallback((task: string | null) => {
     setSelectedTask(task)
   }, [])
 
-  // Função para enviar uma mensagem
   const sendMessage = useCallback(
     async (content: string) => {
       if (!content.trim()) return
   
-      // Verificar se atingiu limites
       if (isRequestLimitReached) {
         toast({
           title: "Limite de requisições atingido",

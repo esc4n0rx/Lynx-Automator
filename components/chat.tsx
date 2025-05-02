@@ -223,7 +223,6 @@ export function Chat({ messages, isLoading }: ChatProps) {
 
           {isLoading && (
             <div className="message assistant">
-              <div className="message-role">Lynx</div>
               <div className="message-content">
                 <div className="thinking-animation">
                   <span className="thinking-dot">Pensando</span>
