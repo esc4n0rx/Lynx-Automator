@@ -225,8 +225,12 @@ export function Chat({ messages, isLoading }: ChatProps) {
             <div className="message assistant">
               <div className="message-role">Lynx</div>
               <div className="message-content">
-                <Skeleton className="h-4 w-3/4 bg-[#141414] mb-2" />
-                <Skeleton className="h-4 w-1/2 bg-[#141414]" />
+                <div className="thinking-animation">
+                  <span className="thinking-dot">Pensando</span>
+                  <span className="thinking-dot">.</span>
+                  <span className="thinking-dot">.</span>
+                  <span className="thinking-dot">.</span>
+                </div>
               </div>
             </div>
           )}
