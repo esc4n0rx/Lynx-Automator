@@ -14,7 +14,7 @@ export function LynxTitle() {
     const canvas = canvasRef.current
     if (!canvas || !containerRef.current) return
     
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { alpha: false })  // Otimização com alpha: false
     if (!ctx) return
 
     const updateCanvasSize = () => {
@@ -22,8 +22,9 @@ export function LynxTitle() {
       if (!container) return
       
       const rect = container.getBoundingClientRect()
-      canvas.width = rect.width
-      canvas.height = rect.height
+      // Uso de valores inteiros para evitar sub-pixel rendering
+      canvas.width = Math.floor(rect.width)
+      canvas.height = Math.floor(rect.height)
       setIsMobile(window.innerWidth < 768)
     }
 
@@ -41,21 +42,29 @@ export function LynxTitle() {
     }[] = []
 
     let textImageData: ImageData | null = null
+    let isInitializing = true
+    let lastMouseMoveTime = 0
+    const mouseMoveThrottle = 16 // 60fps (aprox 16ms)
 
     function createTextImage() {
       if (!ctx || !canvas) return 0
       
-      ctx.fillStyle = '#00FFF0'
-      ctx.font = isMobile ? 'bold 80px Sora' : 'bold 120px Sora'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
+      // Use offscreen canvas para melhorar performance
+      const offscreenCanvas = new OffscreenCanvas(canvas.width, canvas.height)
+      const offscreenCtx = offscreenCanvas.getContext('2d')
       
-      // Draw the Lynx text
+      if (!offscreenCtx) return 0
+      
+      offscreenCtx.fillStyle = '#00FFF0'
+      offscreenCtx.font = isMobile ? 'bold 80px Sora' : 'bold 120px Sora'
+      offscreenCtx.textAlign = 'center'
+      offscreenCtx.textBaseline = 'middle'
+      
+      // Centralizar o texto
       const text = 'Lynx'
-      ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+      offscreenCtx.fillText(text, canvas.width / 2, canvas.height / 2)
       
-      textImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      textImageData = offscreenCtx.getImageData(0, 0, canvas.width, canvas.height)
       
       return 1
     }
@@ -64,21 +73,28 @@ export function LynxTitle() {
       if (!ctx || !canvas || !textImageData) return null
       
       const data = textImageData.data
+      const sampleRate = 3; // Sample every 3 pixels instead of every pixel
       
-      for (let attempt = 0; attempt < 100; attempt++) {
+      for (let attempt = 0; attempt < 50; attempt++) { // Reduzido número de tentativas
         const x = Math.floor(Math.random() * canvas.width)
         const y = Math.floor(Math.random() * canvas.height)
         
-        if (data[(y * canvas.width + x) * 4 + 3] > 128) {
-          return {
-            x: x,
-            y: y,
-            baseX: x,
-            baseY: y,
-            size: Math.random() * 1.5 + 0.5,
-            color: '#ffffff',
-            scatteredColor: '#00FFF0',
-            life: Math.random() * 100 + 50
+        // Otimização: verifique limites antes de acessar dados
+        if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+          const index = (y * canvas.width + x) * 4;
+          
+          // Verifique se o índice está dentro dos limites do array
+          if (index >= 0 && index < data.length && data[index + 3] > 128) {
+            return {
+              x: x,
+              y: y,
+              baseX: x,
+              baseY: y,
+              size: Math.random() * 1.5 + 0.5,
+              color: '#ffffff',
+              scatteredColor: '#00FFF0',
+              life: Math.random() * 200 + 100 // Aumentado para reduzir regeneração frequente
+            }
           }
         }
       }
@@ -87,13 +103,38 @@ export function LynxTitle() {
     }
 
     function createInitialParticles() {
-      // Adjust particle count based on canvas size
-      const baseParticleCount = 5000  // Aumentei a densidade das partículas
-      const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (500 * 200)))
-      
-      for (let i = 0; i < particleCount; i++) {
-        const particle = createParticle()
-        if (particle) particles.push(particle)
+      if (isInitializing) {
+        // Ajusta a densidade de partículas baseada no tamanho do canvas
+        const baseParticleCount = 4000 // Reduzido um pouco para melhor performance
+        const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (500 * 200)))
+        
+        // Inicializa partículas em lotes para não bloquear a UI
+        let particlesCreated = 0
+        const particlesPerBatch = 500
+        
+        const createBatch = () => {
+          const batchSize = Math.min(particlesPerBatch, particleCount - particlesCreated)
+          let created = 0
+          
+          for (let i = 0; i < batchSize; i++) {
+            const particle = createParticle()
+            if (particle) {
+              particles.push(particle)
+              created++
+            }
+            particlesCreated += created
+          }
+          
+          if (particlesCreated < particleCount) {
+            // Agenda o próximo lote
+            setTimeout(createBatch, 0)
+          } else {
+            // Finaliza a inicialização
+            isInitializing = false
+          }
+        }
+        
+        createBatch()
       }
     }
 
@@ -172,6 +213,13 @@ export function LynxTitle() {
     }
 
     const handleMove = (x: number, y: number) => {
+      const now = Date.now()
+      
+      // Throttle mouse move events para melhorar performance
+      if (now - lastMouseMoveTime < mouseMoveThrottle) return
+      
+      lastMouseMoveTime = now
+      
       // Convert page coordinates to canvas coordinates
       const rect = canvas.getBoundingClientRect()
       mousePositionRef.current = { 
@@ -230,13 +278,13 @@ export function LynxTitle() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="mb-8 flex items-center justify-center gap-16 relative h-40"
+      className="mb-8 flex items-center justify-center relative h-40"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-        className="relative"
+        className="absolute left-8"
       >
         <Image 
           src="/mascote.png" 
@@ -247,7 +295,7 @@ export function LynxTitle() {
         />
       </motion.div>
       
-      <div className="relative w-96 h-40">
+      <div className="relative w-96 h-40 mx-auto">
         <canvas 
           ref={canvasRef} 
           className="w-full h-full touch-none"
