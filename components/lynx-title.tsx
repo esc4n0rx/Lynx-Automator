@@ -46,7 +46,7 @@ export function LynxTitle() {
       if (!ctx || !canvas) return 0
       
       ctx.fillStyle = '#00FFF0'
-      ctx.font = isMobile ? 'bold 60px Sora' : 'bold 80px Sora'
+      ctx.font = isMobile ? 'bold 80px Sora' : 'bold 120px Sora'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       
@@ -88,7 +88,7 @@ export function LynxTitle() {
 
     function createInitialParticles() {
       // Adjust particle count based on canvas size
-      const baseParticleCount = 3000
+      const baseParticleCount = 5000  // Aumentei a densidade das partículas
       const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (500 * 200)))
       
       for (let i = 0; i < particleCount; i++) {
@@ -230,24 +230,24 @@ export function LynxTitle() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="mb-8 flex items-center justify-center gap-4 relative h-32"
+      className="mb-8 flex items-center justify-center gap-16 relative h-40"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-        className="absolute left-0"
+        className="relative"
       >
         <Image 
           src="/mascote.png" 
           alt="Lynx Mascote" 
-          width={120} 
-          height={120} 
+          width={100} 
+          height={100} 
           className="object-contain"
         />
       </motion.div>
       
-      <div className="relative w-64 h-32">
+      <div className="relative w-96 h-40">
         <canvas 
           ref={canvasRef} 
           className="w-full h-full touch-none"
