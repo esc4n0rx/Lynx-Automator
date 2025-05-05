@@ -1,7 +1,6 @@
 "use client"
 import React, { useRef, useEffect, useState } from 'react'
 import { motion } from "framer-motion"
-import Image from "next/image"
 
 export function LynxTitle() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -14,7 +13,8 @@ export function LynxTitle() {
     const canvas = canvasRef.current
     if (!canvas || !containerRef.current) return
     
-    const ctx = canvas.getContext('2d', { alpha: false })
+    // Important: Set alpha to true to ensure transparency
+    const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
     const updateCanvasSize = () => {
@@ -22,7 +22,8 @@ export function LynxTitle() {
       if (!container) return
       
       const rect = container.getBoundingClientRect()
-      canvas.width = Math.floor(rect.width)
+      // Make canvas slightly wider to ensure text fits completely
+      canvas.width = Math.floor(rect.width) + 100 // Add extra width
       canvas.height = Math.floor(rect.height)
       setIsMobile(window.innerWidth < 768)
     }
@@ -49,19 +50,32 @@ export function LynxTitle() {
       if (!ctx || !canvas) return 0
       
       const offscreenCanvas = new OffscreenCanvas(canvas.width, canvas.height)
-      const offscreenCtx = offscreenCanvas.getContext('2d')
+      // Important: Set alpha to true here as well
+      const offscreenCtx = offscreenCanvas.getContext('2d', { alpha: true })
       
       if (!offscreenCtx) return 0
       
+      // Clear the canvas first to ensure transparency
+      offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height)
+      
       offscreenCtx.fillStyle = '#00FFF0'
-      offscreenCtx.font = isMobile ? 'bold 80px Sora' : 'bold 120px Sora'
+      
+      // Adjust font size based on screen size
+      const fontSize = isMobile ? '70px' : '110px'
+      offscreenCtx.font = `bold ${fontSize} Sora`
       offscreenCtx.textAlign = 'center'
       offscreenCtx.textBaseline = 'middle'
       
-      const text = 'Lynx'
-      offscreenCtx.fillText(text, canvas.width / 2, canvas.height / 2)
+      const text = 'Dolphin'
       
-      textImageData = offscreenCtx.getImageData(0, 0, canvas.width, canvas.height)
+      // Calculate appropriate text position - center horizontally
+      const textX = offscreenCanvas.width / 2
+      const textY = offscreenCanvas.height / 2
+      
+      // Draw the text at the calculated position
+      offscreenCtx.fillText(text, textX, textY)
+      
+      textImageData = offscreenCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height)
       
       return 1
     }
@@ -76,11 +90,11 @@ export function LynxTitle() {
         const x = Math.floor(Math.random() * canvas.width)
         const y = Math.floor(Math.random() * canvas.height)
         
-        // Otimização: verifique limites antes de acessar dados
+        // Check bounds before accessing data
         if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
           const index = (y * canvas.width + x) * 4;
           
-          // Verifique se o índice está dentro dos limites do array
+          // Check if index is within bounds of the array and if alpha channel has value
           if (index >= 0 && index < data.length && data[index + 3] > 128) {
             return {
               x: x,
@@ -103,11 +117,11 @@ export function LynxTitle() {
       if (!canvas || !isInitializing) return;
 
       if (isInitializing) {
-        // Ajusta a densidade de partículas baseada no tamanho do canvas
-        const baseParticleCount = 4000 // Reduzido um pouco para melhor performance
+        // Adjust particle density based on canvas size
+        const baseParticleCount = 4000
         const particleCount = Math.floor(baseParticleCount * Math.sqrt((canvas.width * canvas.height) / (500 * 200)))
         
-        // Inicializa partículas em lotes para não bloquear a UI
+        // Initialize particles in batches to avoid blocking UI
         let particlesCreated = 0
         const particlesPerBatch = 500
         
@@ -125,10 +139,10 @@ export function LynxTitle() {
           }
           
           if (particlesCreated < particleCount) {
-            // Agenda o próximo lote
+            // Schedule next batch
             setTimeout(createBatch, 0)
           } else {
-            // Finaliza a inicialização
+            // Finish initialization
             isInitializing = false
           }
         }
@@ -142,6 +156,7 @@ export function LynxTitle() {
     function animate() {
       if (!ctx || !canvas) return
       
+      // Clear the entire canvas including background to ensure transparency
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       
       const { x: mouseX, y: mouseY } = mousePositionRef.current
@@ -214,7 +229,7 @@ export function LynxTitle() {
     const handleMove = (x: number, y: number) => {
       const now = Date.now()
       
-      // Throttle mouse move events para melhorar performance
+      // Throttle mouse move events to improve performance
       if (now - lastMouseMoveTime < mouseMoveThrottle) return
       
       lastMouseMoveTime = now
@@ -279,30 +294,16 @@ export function LynxTitle() {
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="mb-8 flex items-center justify-center relative h-40"
     >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-        className="absolute left-8"
-      >
-        <Image 
-          src="/mascote.png" 
-          alt="Lynx Mascote" 
-          width={100} 
-          height={100} 
-          className="object-contain"
-        />
-      </motion.div>
-      
-      <div className="relative w-96 h-40 mx-auto">
+      <div className="relative w-full max-w-xl h-40 mx-auto">
         <canvas 
           ref={canvasRef} 
           className="w-full h-full touch-none"
-          aria-label="Interactive particle effect with Lynx text"
+          aria-label="Interactive particle effect with Dolphin text"
+          style={{ backgroundColor: 'transparent' }} // Explicitly set transparent background
         />
 
         {/* Hidden actual text for accessibility */}
-        <span className="sr-only">Lynx</span>
+        <span className="sr-only">Dolphin</span>
       </div>
     </motion.div>
   )

@@ -1,25 +1,25 @@
-# Lynx Assistente VBA
+# Dolphin Assistente VBA
 
 <p align="center">
-  <img src="public/logo.png" alt="Logo do Lynx" width="250"/>
+  <img src="public/logo.png" alt="Logo do Dolphin" width="250"/>
 </p>
 
 
 ## Visão Geral
 
-Lynx é um assistente de IA especializado, projetado para ajudar profissionais a automatizarem suas tarefas diárias utilizando VBA (Visual Basic for Applications). Ele funciona como seu parceiro de programação pessoal para automação do Microsoft Office, com foco no Excel, mas estendendo-se a outros aplicativos do pacote Office.
+Dolphin é um assistente de IA especializado, projetado para ajudar profissionais a automatizarem suas tarefas diárias utilizando VBA (Visual Basic for Applications). Ele funciona como seu parceiro de programação pessoal para automação do Microsoft Office, com foco no Excel, mas estendendo-se a outros aplicativos do pacote Office.
 
 ## Propósito
 
-Em ambientes corporativos, profissionais frequentemente precisam automatizar tarefas repetitivas, mas podem não possuir a experiência em programação ou o tempo necessário para escrever códigos VBA eficientes. O Lynx preenche esta lacuna fornecendo soluções VBA instantâneas e de alta qualidade, adaptadas às necessidades específicas de cada negócio.
+Em ambientes corporativos, profissionais frequentemente precisam automatizar tarefas repetitivas, mas podem não possuir a experiência em programação ou o tempo necessário para escrever códigos VBA eficientes. O Dolphin preenche esta lacuna fornecendo soluções VBA instantâneas e de alta qualidade, adaptadas às necessidades específicas de cada negócio.
 
 ## Principais Recursos
 
 ### 🤖 Geração de Código
-Gere código VBA personalizado a partir de descrições em linguagem natural. Simplesmente explique o que você precisa, e o Lynx criará um código completo e funcional com tratamento de erros adequado e documentação.
+Gere código VBA personalizado a partir de descrições em linguagem natural. Simplesmente explique o que você precisa, e o Dolphin criará um código completo e funcional com tratamento de erros adequado e documentação.
 
 ### 🔍 Manutenção de Código
-Faça upload de macros existentes para análise e aprimoramento. O Lynx irá:
+Faça upload de macros existentes para análise e aprimoramento. O Dolphin irá:
 - Identificar e corrigir bugs
 - Otimizar gargalos de desempenho
 - Melhorar a legibilidade do código
@@ -27,7 +27,7 @@ Faça upload de macros existentes para análise e aprimoramento. O Lynx irá:
 - Sugerir melhorias arquiteturais
 
 ### 🔄 Integração com SAP
-Especializado em integração SAP-Excel, o Lynx pode converter scripts SAP para código VBA otimizado, automatizando transferências complexas de dados entre SAP e Excel.
+Especializado em integração SAP-Excel, o Dolphin pode converter scripts SAP para código VBA otimizado, automatizando transferências complexas de dados entre SAP e Excel.
 
 ## Como Funciona
 
@@ -72,7 +72,7 @@ Elimine erros humanos em tarefas repetitivas através de automação confiável,
 
 ## Detalhes Técnicos
 
-Lynx é construído sobre um modelo de linguagem de última geração, especificamente ajustado para programação VBA, com:
+Dolphin é construído sobre um modelo de linguagem de última geração, especificamente ajustado para programação VBA, com:
 
 - Conhecimento das melhores práticas de programação VBA
 - Familiaridade com os Modelos de Objeto do Office
@@ -81,7 +81,7 @@ Lynx é construído sobre um modelo de linguagem de última geração, especific
 
 ## Primeiros Passos
 
-1. Acesse a interface do Lynx através do seu navegador web Link:https://lynx-automate.vercel.app/
+1. Acesse a interface do Dolphin através do seu navegador web Link:https://dolphin-automate.vercel.app/
 2. Selecione o tipo de assistência que você precisa
 3. Forneça contexto para seus requisitos específicos
 4. Implemente o código gerado em seu ambiente Excel
@@ -95,8 +95,8 @@ Lynx é construído sobre um modelo de linguagem de última geração, especific
 
 ## Suporte
 
-Para assistência adicional ou dúvidas sobre a implementação do código gerado pelo Lynx em seu ambiente, entre em contato com o suporte pelo e-mail suporte@lynx-vba.com.
+Para assistência adicional ou dúvidas sobre a implementação do código gerado pelo Dolphin em seu ambiente, entre em contato com o suporte pelo e-mail suporte@Dolphin-vba.com.
 
 ---
 
-© 2025 Lynx Assistente VBA | Todos os Direitos Reservados
+© 2025 Dolphin Assistente VBA | Todos os Direitos Reservados
