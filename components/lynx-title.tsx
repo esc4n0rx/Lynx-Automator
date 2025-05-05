@@ -14,7 +14,7 @@ export function LynxTitle() {
     const canvas = canvasRef.current
     if (!canvas || !containerRef.current) return
     
-    const ctx = canvas.getContext('2d', { alpha: false })  // Otimização com alpha: false
+    const ctx = canvas.getContext('2d', { alpha: false })
     if (!ctx) return
 
     const updateCanvasSize = () => {
@@ -22,7 +22,6 @@ export function LynxTitle() {
       if (!container) return
       
       const rect = container.getBoundingClientRect()
-      // Uso de valores inteiros para evitar sub-pixel rendering
       canvas.width = Math.floor(rect.width)
       canvas.height = Math.floor(rect.height)
       setIsMobile(window.innerWidth < 768)
@@ -44,12 +43,11 @@ export function LynxTitle() {
     let textImageData: ImageData | null = null
     let isInitializing = true
     let lastMouseMoveTime = 0
-    const mouseMoveThrottle = 16 // 60fps (aprox 16ms)
+    const mouseMoveThrottle = 16
 
     function createTextImage() {
       if (!ctx || !canvas) return 0
       
-      // Use offscreen canvas para melhorar performance
       const offscreenCanvas = new OffscreenCanvas(canvas.width, canvas.height)
       const offscreenCtx = offscreenCanvas.getContext('2d')
       
@@ -60,7 +58,6 @@ export function LynxTitle() {
       offscreenCtx.textAlign = 'center'
       offscreenCtx.textBaseline = 'middle'
       
-      // Centralizar o texto
       const text = 'Lynx'
       offscreenCtx.fillText(text, canvas.width / 2, canvas.height / 2)
       
@@ -73,9 +70,9 @@ export function LynxTitle() {
       if (!ctx || !canvas || !textImageData) return null
       
       const data = textImageData.data
-      const sampleRate = 3; // Sample every 3 pixels instead of every pixel
+      const sampleRate = 3; 
       
-      for (let attempt = 0; attempt < 50; attempt++) { // Reduzido número de tentativas
+      for (let attempt = 0; attempt < 50; attempt++) { 
         const x = Math.floor(Math.random() * canvas.width)
         const y = Math.floor(Math.random() * canvas.height)
         
@@ -93,7 +90,7 @@ export function LynxTitle() {
               size: Math.random() * 1.5 + 0.5,
               color: '#ffffff',
               scatteredColor: '#00FFF0',
-              life: Math.random() * 200 + 100 // Aumentado para reduzir regeneração frequente
+              life: Math.random() * 200 + 100
             }
           }
         }
@@ -103,6 +100,8 @@ export function LynxTitle() {
     }
 
     function createInitialParticles() {
+      if (!canvas || !isInitializing) return;
+
       if (isInitializing) {
         // Ajusta a densidade de partículas baseada no tamanho do canvas
         const baseParticleCount = 4000 // Reduzido um pouco para melhor performance

@@ -166,8 +166,16 @@
 }
 
 @media (max-width: 768px) {
-  .split-view-container.active {
-    grid-template-columns: 1fr;
+  .chat-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .code-column {
+    order: 2;
+  }
+  
+  .chat-column {
+    order: 1;
   }
 }
 
@@ -320,4 +328,80 @@
   0% { opacity: 0.2; }
   50% { opacity: 1; }
   100% { opacity: 0.2; }
+}
+
+/* Melhorias visuais para o modal de tutorial */
+.tutorial-dialog {
+  max-width: 800px;
+  width: 90vw;
+  background-color: var(--background) !important;
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 15px rgba(0, 179, 166, 0.3);
+}
+
+.tutorial-dialog .tutorial-image-container img {
+  max-width: 100%;
+  border: 1px solid var(--border);
+}
+.tutorial-overlay {
+  background-color: var(--background) !important; /* Força fundo opaco */
+  opacity: 1 !important; /* Remover qualquer opacidade */
+}
+
+/* Botão de tutorial com destaque sutil */
+.tutorial-button {
+  background: linear-gradient(90deg, rgba(0, 179, 166, 0.1), rgba(0, 255, 240, 0.1));
+  border: 1px solid rgba(0, 179, 166, 0.2);
+  transition: all 0.3s ease;
+}
+
+.tutorial-button:hover {
+  background: linear-gradient(90deg, rgba(0, 179, 166, 0.2), rgba(0, 255, 240, 0.2));
+  transform: translateY(-1px);
+}
+
+/* Melhorias na visualização do código */
+.code-block {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.code-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Melhoria visual para o popup */
+.tutorial-popup {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+[data-state=open].DialogOverlay {
+  background-color: var(--background);
+  opacity: 1;
+}
+
+[data-state=open].DialogContent {
+  background-color: var(--background);
+}
+
+/* Step indicator animation */
+@keyframes pulseStep {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.step-indicator div:nth-child(1) {
+  animation: pulseStep 2s infinite;
+  animation-delay: 0.2s;
+}
+
+.step-indicator div:nth-child(2) {
+  animation: pulseStep 2s infinite;
+  animation-delay: 0.4s;
+}
+
+.step-indicator div:nth-child(3) {
+  animation: pulseStep 2s infinite;
+  animation-delay: 0.6s;
 }
