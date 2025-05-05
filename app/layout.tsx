@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Lynx - VBA Assistant",
+  title: "Dolphin - VBA Assistant",
   description: "AI-powered VBA code generation and maintenance",
   generator: 'Paulo Oliveira',
   icons: {
